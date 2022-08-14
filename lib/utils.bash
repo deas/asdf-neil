@@ -2,8 +2,8 @@
 
 set -euo pipefail
 
-# TODO: Ensure this is the correct GitHub homepage where releases can be downloaded for neil.
 GH_REPO="https://github.com/babashka/neil"
+GH_RAW_REPO="https://raw.githubusercontent.com/babashka/neil"
 TOOL_NAME="neil"
 TOOL_TEST="neil --help"
 
@@ -31,7 +31,6 @@ list_github_tags() {
 }
 
 list_all_versions() {
-  # TODO: Adapt this. By default we simply list the tag names from GitHub releases.
   # Change this function if neil has other means of determining installable versions.
   list_github_tags
 }
@@ -41,9 +40,10 @@ download_release() {
   version="$1"
   filename="$2"
 
-  # TODO: Adapt the release URL convention for neil
-  url="$GH_REPO/archive/v${version}.tar.gz"
-
+  # url="$GH_REPO/archive/v${version}.tar.gz"
+  url="$GH_RAW_REPO/v${version}/$TOOL_NAME"
+  # echo $url
+  # https://raw.githubusercontent.com/babashka/neil/v0.1.43/neil
   echo "* Downloading $TOOL_NAME release $version..."
   curl "${curl_opts[@]}" -o "$filename" -C - "$url" || fail "Could not download $url"
 }
@@ -60,10 +60,9 @@ install_version() {
   (
     mkdir -p "$install_path"
     cp -r "$ASDF_DOWNLOAD_PATH"/* "$install_path"
-
-    # TODO: Assert neil executable exists.
     local tool_cmd
     tool_cmd="$(echo "$TOOL_TEST" | cut -d' ' -f1)"
+
     test -x "$install_path/$tool_cmd" || fail "Expected $install_path/$tool_cmd to be executable."
 
     echo "$TOOL_NAME $version installation was successful!"
