@@ -13,9 +13,22 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          - macos-latest
+          # - macos-latest
     runs-on: ${{ matrix.os }}
     steps:
+      - name: asdf_plugin_test
+        uses: asdf-vm/actions/setup@v1
+      - name: asdf_install
+        uses: asdf-vm/actions/install@v1
+        # TODO: Dedupe version
+        with:
+         tool_versions: "babashka 0.9.159"
+      - name: bb-hack # TODO: Ugly. Open for alternatives
+        run: sudo cp "${ASDF_DIR}/installs/babashka/0.9.159/bin/bb" /usr/bin && asdf plugin remove babashka
+      - name: Set up openjdk-jre
+        run: >
+         sudo apt-get update &&
+         sudo apt-get install --no-install-recommends --yes openjdk-8-jre
       - name: asdf_plugin_test
         uses: asdf-vm/actions/plugin-test@v1
         with:
